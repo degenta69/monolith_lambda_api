@@ -1,0 +1,29 @@
+{
+  "name": "monolith_lambda_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "node build.js",
+    "deploy": "chmod +x cicd.sh && ./cicd.sh"
+  },
+  "author": "",
+  "license": "ISC",
+  "prisma": {
+    "schema": "src/prisma/schema"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.16.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.23.0",
+    "@types/aws-lambda": "^8.10.141",
+    "@types/node": "^20.14.10",
+    "aws-lambda": "^1.0.7",
+    "prisma": "^5.16.2",
+    "ts-node": "^10.9.2",
+    "@aws-sdk/client-kms": "^3.614.0"
+  }
+}

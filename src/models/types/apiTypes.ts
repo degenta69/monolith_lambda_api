@@ -1,0 +1,3 @@
+import { APIGatewayEventRequestContextV2, APIGatewayProxyEventV2WithRequestContext } from "aws-lambda"
+
+export type APIHttpProxyEvent = APIGatewayProxyEventV2WithRequestContext<APIGatewayEventRequestContextV2>
