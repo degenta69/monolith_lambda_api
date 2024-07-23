@@ -119,7 +119,7 @@ This section walks you through the prerequisites for development and guides you 
 Clone the project
 
 ```bash
-  git clone https://github.com/dipanshSaxenaVivo/monolith_lambda_api
+  git clone https://github.com/dipanshSaxenaVivo/monolith_lambda_api.git
 ```
 
 Go to the project directory
