@@ -3,3 +3,4 @@
 /dist
 /event.json
 /package-lock.json
+/.gitignore
