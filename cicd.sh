@@ -3,26 +3,26 @@
 # Exit immediately if a command exits with a non-zero status.
 set -e
 
-# Function to prompt for user input
-prompt_for_bucket_name() {
-  read -p "Please enter the S3 bucket name: " S3_BUCKET_NAME
-  if [ -z "$S3_BUCKET_NAME" ]; then
-    echo "S3 bucket name cannot be empty. Please try again."
-    prompt_for_bucket_name
-  fi
-}
-# Function to prompt for user input
-prompt_for_lambda_name() {
-  read -p "Please enter the Lambda function name: " LAMBDA_FUNCTION_NAME
-  if [ -z "$LAMBDA_FUNCTION_NAME" ]; then
-    echo "Lambda function name cannot be empty. Please try again."
-    prompt_for_input
-  fi
-}
+# # Function to prompt for user input
+# prompt_for_bucket_name() {
+#   read -p "Please enter the S3 bucket name: " S3_BUCKET_NAME
+#   if [ -z "$S3_BUCKET_NAME" ]; then
+#     echo "S3 bucket name cannot be empty. Please try again."
+#     prompt_for_bucket_name
+#   fi
+# }
+# # Function to prompt for user input
+# prompt_for_lambda_name() {
+#   read -p "Please enter the Lambda function name: " LAMBDA_FUNCTION_NAME
+#   if [ -z "$LAMBDA_FUNCTION_NAME" ]; then
+#     echo "Lambda function name cannot be empty. Please try again."
+#     prompt_for_input
+#   fi
+# }
 
 # # hardcoded variables
-# S3_BUCKET_NAME="testingdi-lambda-code"
-# LAMBDA_FUNCTION_NAME="testingDI"
+S3_BUCKET_NAME="testingdi-lambda-code"
+LAMBDA_FUNCTION_NAME="testingDI"
 
 # Directory paths
 SOURCE_DIR="$(pwd)"
@@ -59,14 +59,16 @@ npx prisma generate
 # Step 6: Delete the .env file before zipping
 echo "Deleting .env file from dist directory..."
 rm "${DIST_DIR}/.env"
+rm rf "${DIST_DIR}/node_modules/prisma"
+rm rf "${DIST_DIR}/node_modules/@prisma/engines"
 
 # Step 7: Zip the contents of the dist directory using 7zip
 echo "Zipping the contents of the dist directory..."
 cd "${DIST_DIR}"
 7z a -tzip "${SOURCE_DIR}/dist.zip" *
 
-# Prompt for S3 bucket name
-prompt_for_bucket_name
+# # Prompt for S3 bucket name
+# prompt_for_bucket_name
 
 # Step 8: Upload to S3
 echo "Uploading dist.zip to s3://${S3_BUCKET_NAME}/..."
@@ -79,8 +81,8 @@ echo "Deployment completed. S3 Object URL: ${S3_OBJECT_URL}"
 # Return the S3 object link
 echo "S3 Object URL: ${S3_OBJECT_URL}"
 
-# Prompt for lambda functionn name
-prompt_for_lambda_name
+# # Prompt for lambda functionn name
+# prompt_for_lambda_name
 
 # Step 10: Upload the S3_OBJECT_URL to the specified Lambda function
 echo "Uploading S3 object URL to Lambda function: ${LAMBDA_FUNCTION_NAME}..."
