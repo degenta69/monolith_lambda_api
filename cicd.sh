@@ -24,11 +24,16 @@ set -e
 S3_BUCKET_NAME="testingdi-lambda-code"
 LAMBDA_FUNCTION_NAME="testingDI"
 
+
+
 # Directory paths
 SOURCE_DIR="$(pwd)"
 DIST_DIR="${SOURCE_DIR}/dist"
 PRISMA_SRC_DIR="${SOURCE_DIR}/src/prisma"
 PRISMA_DIST_DIR="${DIST_DIR}/src/prisma"
+
+# Step 0: Clear dist folder
+find "${DIST_DIR}" -mindepth 1 -delete
 
 # Step 1: Transpile the TypeScript code
 echo "Running npm build..."
@@ -59,8 +64,10 @@ npx prisma generate
 # Step 6: Delete the .env file before zipping
 echo "Deleting .env file from dist directory..."
 rm "${DIST_DIR}/.env"
-rm rf "${DIST_DIR}/node_modules/prisma"
-rm rf "${DIST_DIR}/node_modules/@prisma/engines"
+find "${DIST_DIR}/node_modules/.bin" -mindepth 1 -delete
+find "${DIST_DIR}/node_modules/.cache" -mindepth 1 -delete
+rm -rf "${DIST_DIR}/node_modules/prisma"
+rm -rf "${DIST_DIR}/node_modules/@prisma/engines"
 
 # Step 7: Zip the contents of the dist directory using 7zip
 echo "Zipping the contents of the dist directory..."

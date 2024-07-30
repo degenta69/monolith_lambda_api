@@ -1,4 +1,4 @@
-export enum routeEnums {
+export enum RouteEnums {
   '/test/user/add' = '/test/user/add',
   '/test/user/delete' = '/test/user/delete',
   '/test/user/update' = '/test/user/update',
