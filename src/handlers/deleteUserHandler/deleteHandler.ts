@@ -1,8 +1,8 @@
+import { IDeleteUserHandlerRequest } from "models/HandlerSpecificTypes";
 import { IDatabaseClient } from "models/interface";
-import { IdValidateModel } from "schema/idValidateSchema";
 
-export const deleteUser = (userID: IdValidateModel, Prisma: IDatabaseClient) => {
-  const result = Prisma.users.delete({
+export const deleteUser = async (userID: IDeleteUserHandlerRequest, Prisma: IDatabaseClient) => {
+  const result = await Prisma.users.delete({
     where: {
       id: userID.id
     }

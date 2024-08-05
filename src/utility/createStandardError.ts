@@ -1,4 +1,4 @@
-import { IError } from "models/apiResponses";
+import { IError } from "models/HandlerSpecificTypes";
 import { ResponseCodeEnum } from "models/enums";
 import { responseErrorMessage } from "resources";
 

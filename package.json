@@ -17,8 +17,7 @@
     "schema": "src/prisma/schema"
   },
   "dependencies": {
-    "@prisma/client": "^5.16.2",
-    "yup": "^1.4.0"
+    "@prisma/client": "^5.16.2"
   },
   "devDependencies": {
     "@aws-sdk/client-kms": "^3.614.0",

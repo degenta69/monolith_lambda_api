@@ -4,11 +4,10 @@ build({
   entryPoints: [
     "./src/index.ts",
     "./src/dependencies/index.ts",
+    "./src/exceptions/http.exception/*.ts",
     "./src/handlers/index.ts",
     "./src/routes/index.ts",
     "./src/utility/index.ts",
-    // "./src/middleware/index.ts",
-    "./src/schema/index.ts",
     "./src/resources/index.ts",
   ],
   outdir: "dist/src",

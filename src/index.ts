@@ -1,10 +1,11 @@
 import { Prisma } from "@prisma/client";
 import { Context, APIGatewayProxyResult } from "aws-lambda";
 import { applyKms, applyConsoleLogger, applyPrisma } from "dependencies";
+import { HttpException } from "exceptions/http.exception";
 import { RouteEnums, ResponseCodeEnum, HttpStatusCode } from "models/enums";
 import { APIHttpProxyEvent } from "models/types";
 import { ROUTE_CONTAINER } from "routes";
-import { createStandardError } from "utility";import { ValidationError } from "yup";
+import { createStandardError } from "utility";
 ;
 
 /**
@@ -54,7 +55,7 @@ export const handler = async (
   // Check if the route exists in the route container
   if (!(event.rawPath in ROUTE_CONTAINER)) {
     return {
-      statusCode: 404,
+      statusCode: HttpStatusCode.NOT_FOUND_404,
       body: JSON.stringify(createStandardError(ResponseCodeEnum.RESOURCE_NOT_FOUND)),
     };
   }
@@ -71,13 +72,6 @@ export const handler = async (
 
     // handles prisma client knows errors
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      if (error.code === "P2002") {
-        return {
-          statusCode: HttpStatusCode.CONFLICT_409,
-          body: JSON.stringify(createStandardError(error.code as any)),
-        };
-      }
-
       return {
         statusCode: HttpStatusCode.BAD_REQUEST_400,
         body: JSON.stringify(createStandardError(error.code as any)),
@@ -92,13 +86,14 @@ export const handler = async (
       };
     }
 
-    if(error instanceof ValidationError){
+    if(error instanceof HttpException){
       return {
-        statusCode:HttpStatusCode.BAD_REQUEST_400,
-        body:JSON.stringify(createStandardError(parseInt(error.message),error.errors))
+        statusCode: error.getStatus(),
+        body: JSON.stringify(error.getResponse() ?? "{}")
       }
     }
 
+    // base error for internal server error 500
     return {
       statusCode: HttpStatusCode.INTERNAL_SERVER_ERROR_500,
       body: JSON.stringify(createStandardError(ResponseCodeEnum.INTERNAL_SERVER_ERROR)),

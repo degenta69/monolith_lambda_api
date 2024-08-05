@@ -1,6 +1,5 @@
 import * as Prisma from "@prisma/client";
 import { IDependencyContainer } from "models/interface";
-import { AnySchema, ValidationError } from "yup";
 console.log("prisma utility");
 
 /**
@@ -21,8 +20,7 @@ export const applyPrisma = (
    * instantiates prisma client with the decrypted mongodb connection string
    */
   let prisma = new Prisma.PrismaClient({
-    datasourceUrl: decryptedEnvString,
-    errorFormat:"colorless",
+    datasourceUrl: decryptedEnvString
   });
 
   console.log("prisma client instantiated");

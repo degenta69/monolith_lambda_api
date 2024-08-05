@@ -1,27 +1,38 @@
-import { CreateFailure, CreateSuccess } from "models/apiResponses";
+import { BadRequestException } from "exceptions/http.exception/bad-request.exception";
+import { NotFoundException } from "exceptions/http.exception/not-found.exception";
+import {
+  CreateFailure,
+  CreateSuccess,
+  IDeleteUserHandlerRequest,
+  IResponse,
+} from "models/HandlerSpecificTypes";
 import { ResponseCodeEnum } from "models/enums";
 import { IDatabaseClient } from "models/interface";
-import { IdValidateModel, idValidateSchema } from "schema/idValidateSchema";
-import { createStandardError } from "utility";
+import { createStandardError, hasRequiredFields } from "utility";
 
 export const validateDeleteUserRequest = async (
-  user: IdValidateModel,
+  userID: IDeleteUserHandlerRequest,
   Prisma: IDatabaseClient
-) => {
-  let result = await idValidateSchema.validate(user,{stripUnknown:true,strict:true,abortEarly:true});
-  console.log(result, "validation result");
+): Promise<IResponse<IDeleteUserHandlerRequest>> => {
+  // validate required fields
+  const notAvailableFields = hasRequiredFields(userID, "id");
+  if (notAvailableFields.length > 0) {
+    return CreateFailure(
+      createStandardError(
+        ResponseCodeEnum.ID_IS_REQUIRED
+      )
+    );
+  }
 
   let doesUserExist = await Prisma.users.findUnique({
     where: {
-      id: user.id,
+      id: userID.id,
     },
   });
 
   if (!Boolean(doesUserExist)) {
-    return CreateFailure(
-      createStandardError(ResponseCodeEnum.USER_ID_NOT_EXIST)
-    );
+    throw new NotFoundException(ResponseCodeEnum.USER_ID_NOT_EXIST);
   }
 
-  return CreateSuccess(user);
+  return CreateSuccess(userID);
 };

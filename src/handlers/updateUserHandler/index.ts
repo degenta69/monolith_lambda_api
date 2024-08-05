@@ -1,10 +1,14 @@
-import * as Prisma from "@prisma/client";
-import { IUpdateUserHandlerResponse } from "models/apiResponses";
-import { HttpStatusCode } from "models/enums";
+import {
+  CreateFailure,
+  CreateSuccess,
+  IResponse,
+  IUpdateUserHandlerRequest,
+  IUpdateUserHandlerResponse,
+} from "models/HandlerSpecificTypes";
 import { IDependencyContainer } from "models/interface";
-import { APIResponse } from "models/types";
 import { validateUpdateUserRequest } from "./validateUpdateUserRequest";
 import { updateUser } from "./updateUser";
+import { BadRequestException } from "exceptions/http.exception/bad-request.exception";
 
 /**
  * Handles API requests to update a user.
@@ -16,21 +20,18 @@ import { updateUser } from "./updateUser";
  */
 export const updateUserHandler = async (
   DC: IDependencyContainer,
-  userData: Prisma.users
-): Promise<APIResponse<IUpdateUserHandlerResponse>> => {
-  let validationResult = await validateUpdateUserRequest(userData, DC.db_client);
+  userData: IUpdateUserHandlerRequest
+): Promise<IResponse<IUpdateUserHandlerResponse>> => {
+  let validationResult = await validateUpdateUserRequest(
+    userData,
+    DC.db_client
+  );
 
-  if (!validationResult.success) {
-    return {
-      statusCode: HttpStatusCode.BAD_REQUEST_400,
-      body: validationResult.data,
-    };
+  if (validationResult.success === false) {
+    return CreateFailure(validationResult.data);
   }
 
-  let addedUser = await updateUser(userData, DC.db_client)
+  let updatedUser = await updateUser(userData, DC.db_client);
 
-  return {
-    statusCode: HttpStatusCode.OK_200,
-    body: { user: addedUser },
-  };
-}
+  return CreateSuccess(updatedUser);
+};

@@ -10,9 +10,19 @@
  * const hasFields = hasRequiredFields(event.body, 'email', 'name');
  * returns true if event.body has both 'email' and 'name' fields
  */
-export function hasRequiredFields<T extends object,K extends keyof T>(obj: T, ...fields: K[]): boolean {
+export function hasRequiredFields<T extends object, K extends keyof T>(
+  obj: T,
+  ...fields: K[]
+): string[] {
   const flatFields = fields.flat();
-  return flatFields.every(field => obj.hasOwnProperty(field));
+  return flatFields.reduce((acc: any[], current, index) => {
+    if (obj.hasOwnProperty(current)) {
+      return acc;
+    } else {
+      acc.push(current);
+      return acc;
+    }
+  }, []);
 }
 
 /**
@@ -43,6 +53,6 @@ export const getAllValuesFromEnum = <T extends Record<number, string>>(enumObjec
  * @param stringifiedBody 
  * @returns T
  */
-export const parseEventBody = <T>(stringifiedBody:string|undefined)=>{
-  return JSON.parse(stringifiedBody ?? "{}") as T
+export const parseEventBody = (stringifiedBody:string|undefined)=>{
+  return JSON.parse(stringifiedBody ?? "{}")
 }

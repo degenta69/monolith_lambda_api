@@ -1,32 +1,36 @@
-import { users } from "@prisma/client";
+import { NotFoundException } from "exceptions/http.exception/not-found.exception";
 import {
   CreateFailure,
   CreateSuccess,
   IResponse,
-} from "models/apiResponses";
+  IUpdateUserHandlerRequest,
+} from "models/HandlerSpecificTypes";
 import { ResponseCodeEnum } from "models/enums";
 import { IDatabaseClient } from "models/interface";
-import { addUserSchema, updateUserSchema } from "schema";
 import { createStandardError, hasRequiredFields } from "utility";
 
 export const validateUpdateUserRequest = async (
-  user: users,
+  user: IUpdateUserHandlerRequest,
   Prisma: IDatabaseClient
-): Promise<IResponse<users>> => {
-
-  let result = await updateUserSchema.validate(user,{stripUnknown:true,strict:true,abortEarly:true})
-  console.log(result,'validation result')
+): Promise<IResponse<IUpdateUserHandlerRequest>> => {
+  // validate required fields
+  const notAvailableFields = hasRequiredFields(user, "id");
+  if (notAvailableFields.length > 0) {
+    return CreateFailure(
+      createStandardError(
+        ResponseCodeEnum.ID_IS_REQUIRED
+      )
+    );
+  }
 
   let doesUserExist = await Prisma.users.findUnique({
     where: {
-      id:user.id
+      id: user.id,
     },
   });
 
   if (!Boolean(doesUserExist)) {
-    return CreateFailure(
-      createStandardError(ResponseCodeEnum.USER_ID_NOT_EXIST)
-    );
+    throw new NotFoundException(ResponseCodeEnum.USER_ID_NOT_EXIST);
   }
 
   return CreateSuccess(user);

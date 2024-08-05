@@ -5,7 +5,7 @@ import {
   APIGatewayProxyResult,
   Context,
 } from "aws-lambda";
-import { IError } from "models/apiResponses";
+import { IError } from "models/HandlerSpecificTypes";
 import { IDependencyContainer } from "models/interface";
 
 export type APIHttpProxyEvent = APIGatewayProxyEventV2WithRequestContext<
@@ -13,10 +13,6 @@ export type APIHttpProxyEvent = APIGatewayProxyEventV2WithRequestContext<
     APIGatewayEventRequestContextLambdaAuthorizer<any>
   >
 >;
-
-export type APIResponse<T> = Omit<APIGatewayProxyResult,'body'> & {
-  body: T | IError;
-};
 
 export type HandlerType = (
   DC: IDependencyContainer,

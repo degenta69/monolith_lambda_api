@@ -1,24 +1,28 @@
-import { users } from "@prisma/client";
+import { ConflictException } from "exceptions/http.exception/conflict.exception";
 import {
   CreateFailure,
   CreateSuccess,
+  IAddUserHandlerRequest,
   IResponse,
-} from "models/apiResponses";
+} from "models/HandlerSpecificTypes";
 import { ResponseCodeEnum } from "models/enums";
 import { IDatabaseClient } from "models/interface";
-import { addUserSchema } from "schema";
 import { createStandardError, hasRequiredFields } from "utility";
 
 export const validateAddUserRequest = async (
-  user: users,
+  user: IAddUserHandlerRequest,
   Prisma: IDatabaseClient
-): Promise<IResponse<users>> => {
-  // if (hasRequiredFields(user, "role", "email", "name") === false) {
-  //   return CreateFailure(createStandardError(ResponseCodeEnum.INVALID_BODY));
-  // }
-
-  let result = await addUserSchema.validate(user,{stripUnknown:true,strict:true,abortEarly:true})
-  console.log(result,'validation result')
+): Promise<IResponse<IAddUserHandlerRequest>> => {
+  // validate required fields
+  const notAvailableFields = hasRequiredFields(user, "email", "name", "role");
+  if (notAvailableFields.length > 0) {
+    return CreateFailure(
+      createStandardError(
+        ResponseCodeEnum.REQUIRED_FIELDS_NOT_GIVEN,
+        notAvailableFields
+      )
+    );
+  }
 
   let userCount = await Prisma.users.count({
     where: {
@@ -30,9 +34,7 @@ export const validateAddUserRequest = async (
   let doesUserExist = userCount > 0;
 
   if (doesUserExist) {
-    return CreateFailure(
-      createStandardError(ResponseCodeEnum.USER_ALREADY_EXIST)
-    );
+    throw new ConflictException(ResponseCodeEnum.USER_ALREADY_EXIST);
   }
 
   return CreateSuccess(user);
